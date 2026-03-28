@@ -100,7 +100,10 @@ jobs:
             return 0;
           }
           CEOF
-          gcc /tmp/test_c_lib.c -L/usr/local/lib -lliblibsql -o /tmp/test_c_lib && LD_LIBRARY_PATH=/usr/local/lib /tmp/test_c_lib
+          echo "=== Compiling C test ==="
+          gcc /tmp/test_c_lib.c -L/usr/local/lib -lliblibsql -o /tmp/test_c_lib -Wl,-rpath,/usr/local/lib
+          echo "=== Running C test ==="
+          /tmp/test_c_lib
       
       - name: Debug structure sizes
         run: |
