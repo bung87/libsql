@@ -69,13 +69,11 @@ jobs:
       
       - name: Build examples
         run: |
-          nim c --passL:"-L/usr/local/lib" \
-                --passL:"-lliblibsql" \
+          nim c --passL:"/usr/local/lib/liblibsql.so" \
                 --passL:"-Wl,-rpath,/usr/local/lib" \
                 -o:examples/basic_example \
                 examples/basic_example.nim
-          nim c --passL:"-L/usr/local/lib" \
-                --passL:"-lliblibsql" \
+          nim c --passL:"/usr/local/lib/liblibsql.so" \
                 --passL:"-Wl,-rpath,/usr/local/lib" \
                 -o:examples/memory_db_example \
                 examples/memory_db_example.nim
