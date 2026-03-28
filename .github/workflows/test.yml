@@ -136,7 +136,6 @@ jobs:
           gcc /tmp/check_sizes.c -o /tmp/check_sizes && /tmp/check_sizes
           
           cat > /tmp/check_offsets.nim << 'NIMEOF'
-          import std/stddefects
           type
             libsql_cypher_t {.size: sizeof(cint).} = enum
               A = 0
