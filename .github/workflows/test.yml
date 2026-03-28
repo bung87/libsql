@@ -40,6 +40,7 @@ jobs:
           git clone --depth 1 https://github.com/tursodatabase/libsql-c.git /tmp/libsql-c
           cd /tmp/libsql-c
           cargo build --release
+          sudo mkdir -p /usr/local/lib /usr/local/include
           sudo cp target/release/liblibsql.so /usr/local/lib/
           sudo cp libsql.h /usr/local/include/
           sudo ldconfig
@@ -57,11 +58,11 @@ jobs:
       
       - name: Build examples
         run: |
-          nim c --passL:"-L/usr/local/lib -lliblibsql" \
+          nim c --passL:"/usr/local/lib/liblibsql.so" \
                 --passL:"-Wl,-rpath,/usr/local/lib" \
                 -o:examples/basic_example \
                 examples/basic_example.nim
-          nim c --passL:"-L/usr/local/lib -lliblibsql" \
+          nim c --passL:"/usr/local/lib/liblibsql.so" \
                 --passL:"-Wl,-rpath,/usr/local/lib" \
                 -o:examples/memory_db_example \
                 examples/memory_db_example.nim
