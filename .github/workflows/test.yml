@@ -86,12 +86,16 @@ jobs:
             printf("C: sizeof(cypher_t) = %zu\n", sizeof(cypher_t));
             printf("C: sizeof(bool) = %zu\n", sizeof(bool));
             printf("C: sizeof(desc_t) = %zu\n", sizeof(desc_t));
+            printf("C: offsetof(cypher) = %zu\n", offsetof(desc_t, cypher));
+            printf("C: offsetof(disable_read_your_writes) = %zu\n", offsetof(desc_t, disable_read_your_writes));
+            printf("C: offsetof(namespace) = %zu\n", offsetof(desc_t, namespace));
             return 0;
           }
           CEOF
           gcc /tmp/check_sizes.c -o /tmp/check_sizes && /tmp/check_sizes
           
-          cat > /tmp/check_sizes.nim << 'NIMEOF'
+          cat > /tmp/check_offsets.nim << 'NIMEOF'
+          import std/stddefects
           type
             libsql_cypher_t {.size: sizeof(cint).} = enum
               A = 0
@@ -108,11 +112,15 @@ jobs:
               synced: bool
               disable_safety_assert: bool
               namespace: cstring
+          let d = libsql_database_desc_t()
           echo "Nim: sizeof(libsql_cypher_t) = ", sizeof(libsql_cypher_t)
           echo "Nim: sizeof(bool) = ", sizeof(bool)
-          echo "Nim: sizeof(libsql_database_desc_t) = ", sizeof(libsql_database_desc_t)
+          echo "Nim: sizeof(desc_t) = ", sizeof(libsql_database_desc_t)
+          echo "Nim: offsetof(cypher) = ", cast[int](addr d.cypher) - cast[int](addr d)
+          echo "Nim: offsetof(disable_read_your_writes) = ", cast[int](addr d.disable_read_your_writes) - cast[int](addr d)
+          echo "Nim: offsetof(namespace) = ", cast[int](addr d.namespace) - cast[int](addr d)
           NIMEOF
-          nim c -r /tmp/check_sizes.nim
+          nim c -r /tmp/check_offsets.nim
       
       - name: Run tests
         run: LD_LIBRARY_PATH=/usr/local/lib nimble test
