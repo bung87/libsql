@@ -52,9 +52,12 @@ jobs:
         run: |
           ls -la /usr/local/lib/liblibsql* || true
           ldconfig -p | grep libsql || true
+          file /usr/local/lib/liblibsql.so || true
+          ldd /usr/local/lib/liblibsql.so || true
+          nm -D /usr/local/lib/liblibsql.so | grep libsql_database_init || true
       
       - name: Run tests
-        run: nimble test
+        run: LD_LIBRARY_PATH=/usr/local/lib nimble test
       
       - name: Build examples
         run: |
