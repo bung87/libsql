@@ -1,7 +1,8 @@
 switch("path", "$projectDir/../src")
 
 when defined(linux):
-  switch("passL", "/usr/local/lib/liblibsql.so")
+  switch("passL", "-L/usr/local/lib")
+  switch("passL", "-lliblibsql")
   switch("passL", "-Wl,-rpath,/usr/local/lib")
 elif defined(macosx):
   let home = getEnv("HOME")
