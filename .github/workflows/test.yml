@@ -50,11 +50,16 @@ jobs:
       
       - name: Verify installation
         run: |
+          echo "=== Library files ==="
           ls -la /usr/local/lib/liblibsql* || true
+          echo "=== ldconfig cache ==="
           ldconfig -p | grep libsql || true
-          file /usr/local/lib/liblibsql.so || true
+          echo "=== Library dependencies ==="
           ldd /usr/local/lib/liblibsql.so || true
-          nm -D /usr/local/lib/liblibsql.so | grep libsql_database_init || true
+          echo "=== Symbol check ==="
+          nm -D /usr/local/lib/liblibsql.so | grep -E "(libsql_setup|libsql_database_init)" || true
+          echo "=== File type ==="
+          file /usr/local/lib/liblibsql.so || true
       
       - name: Run tests
         run: LD_LIBRARY_PATH=/usr/local/lib nimble test
