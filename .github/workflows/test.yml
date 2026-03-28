@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        nim-version: ['2.0.x', 'stable']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Cache libSQL build
+        uses: actions/cache@v4
+        id: cache-libsql
+        with:
+          path: /usr/local/lib/liblibsql.so
+          key: libsql-${{ runner.os }}-${{ hashFiles('/tmp/libsql-c/Cargo.lock') }}
+      
+      - name: Setup Nim
+        uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: ${{ matrix.nim-version }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Install Rust (if cache miss)
+        if: steps.cache-libsql.outputs.cache-hit != 'true'
+        uses: dtolnay/rust-action@stable
+      
+      - name: Build libSQL C library (if cache miss)
+        if: steps.cache-libsql.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 https://github.com/tursodatabase/libsql-c.git /tmp/libsql-c
+          cd /tmp/libsql-c
+          cargo build --release
+          sudo cp target/release/liblibsql.so /usr/local/lib/
+          sudo cp libsql.h /usr/local/include/
+          sudo ldconfig
+      
+      - name: Update library cache
+        run: sudo ldconfig
+      
+      - name: Verify installation
+        run: |
+          ls -la /usr/local/lib/liblibsql* || true
+          ldconfig -p | grep libsql || true
+      
+      - name: Run tests
+        run: nimble test
+      
+      - name: Build examples
+        run: |
+          nim c --passL:"-L/usr/local/lib -lliblibsql" \
+                --passL:"-Wl,-rpath,/usr/local/lib" \
+                -o:examples/basic_example \
+                examples/basic_example.nim
+          nim c --passL:"-L/usr/local/lib -lliblibsql" \
+                --passL:"-Wl,-rpath,/usr/local/lib" \
+                -o:examples/memory_db_example \
+                examples/memory_db_example.nim
+          
+      - name: Test examples run
+        run: |
+          ./examples/basic_example
+          ./examples/memory_db_example

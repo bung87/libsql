@@ -1,0 +1,38 @@
+*
+!**/
+!*.*
+# Nim
+nimcache/
+pnimcache/
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.o
+*.obj
+
+# Compiled binaries
+bin/
+dist/
+
+# Test databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# nimble
+nimble.develop
+nimble.paths
