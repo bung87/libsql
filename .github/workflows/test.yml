@@ -61,6 +61,47 @@ jobs:
           echo "=== File type ==="
           file /usr/local/lib/liblibsql.so || true
       
+      - name: Test C library directly
+        run: |
+          cat > /tmp/test_c_lib.c << 'CEOF'
+          #include <stdio.h>
+          #include <stdlib.h>
+          #include "/usr/local/include/libsql.h"
+          int main() {
+            printf("Testing libSQL C library...\n");
+            const libsql_error_t *err = libsql_setup((libsql_config_t){0});
+            if (err) {
+              printf("Setup failed: %s\n", libsql_error_message(err));
+              return 1;
+            }
+            printf("Setup OK\n");
+            
+            libsql_database_desc_t desc = {0};
+            desc.path = ":memory:";
+            desc.cypher = LIBSQL_CYPHER_DEFAULT;
+            
+            libsql_database_t db = libsql_database_init(desc);
+            if (db.err) {
+              printf("Database init failed: %s\n", libsql_error_message(db.err));
+              return 1;
+            }
+            printf("Database init OK\n");
+            
+            libsql_connection_t conn = libsql_database_connect(db);
+            if (conn.err) {
+              printf("Connect failed: %s\n", libsql_error_message(conn.err));
+              return 1;
+            }
+            printf("Connect OK\n");
+            
+            libsql_connection_deinit(conn);
+            libsql_database_deinit(db);
+            printf("All tests passed!\n");
+            return 0;
+          }
+          CEOF
+          gcc /tmp/test_c_lib.c -L/usr/local/lib -lliblibsql -o /tmp/test_c_lib && LD_LIBRARY_PATH=/usr/local/lib /tmp/test_c_lib
+      
       - name: Debug structure sizes
         run: |
           cat > /tmp/check_sizes.c << 'CEOF'
