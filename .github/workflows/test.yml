@@ -166,7 +166,7 @@ jobs:
           nim c -r /tmp/check_offsets.nim
       
       - name: Run tests
-        run: LD_LIBRARY_PATH=/usr/local/lib nimble test
+        run: nimble test -- --passL:/usr/local/lib/liblibsql.so --passL:-Wl,-rpath,/usr/local/lib
       
       - name: Check test binary linking
         run: ldd tests/test_libsql || true
