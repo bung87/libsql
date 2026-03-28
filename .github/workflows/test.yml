@@ -101,7 +101,7 @@ jobs:
           }
           CEOF
           echo "=== Compiling C test ==="
-          gcc /tmp/test_c_lib.c -L/usr/local/lib -lliblibsql -o /tmp/test_c_lib -Wl,-rpath,/usr/local/lib
+          gcc /tmp/test_c_lib.c /usr/local/lib/liblibsql.so -o /tmp/test_c_lib -Wl,-rpath,/usr/local/lib
           echo "=== Running C test ==="
           /tmp/test_c_lib
       
@@ -173,12 +173,10 @@ jobs:
       
       - name: Build examples
         run: |
-          nim c --passL:"/usr/local/lib/liblibsql.so" \
-                --passL:"-Wl,-rpath,/usr/local/lib" \
+          nim c --passL:"/usr/local/lib/liblibsql.so -Wl,-rpath,/usr/local/lib" \
                 -o:examples/basic_example \
                 examples/basic_example.nim
-          nim c --passL:"/usr/local/lib/liblibsql.so" \
-                --passL:"-Wl,-rpath,/usr/local/lib" \
+          nim c --passL:"/usr/local/lib/liblibsql.so -Wl,-rpath,/usr/local/lib" \
                 -o:examples/memory_db_example \
                 examples/memory_db_example.nim
           
