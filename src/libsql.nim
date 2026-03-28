@@ -14,43 +14,51 @@ else:
   {.push cdecl, dynlib: liblibsql.}
 
 type
-  libsql_cypher_t* = enum
+  libsql_cypher_t* {.size: sizeof(cint).} = enum
     LIBSQL_CYPHER_DEFAULT = 0
     LIBSQL_CYPHER_AES256
 
-  libsql_type_t* = enum
+  libsql_type_t* {.size: sizeof(cint).} = enum
     LIBSQL_TYPE_INTEGER = 1
     LIBSQL_TYPE_REAL = 2
     LIBSQL_TYPE_TEXT = 3
     LIBSQL_TYPE_BLOB = 4
     LIBSQL_TYPE_NULL = 5
 
-  libsql_tracing_level_t* = enum
+  libsql_tracing_level_t* {.size: sizeof(cint).} = enum
     LIBSQL_TRACING_LEVEL_ERROR = 1
     LIBSQL_TRACING_LEVEL_WARN
     LIBSQL_TRACING_LEVEL_INFO
     LIBSQL_TRACING_LEVEL_DEBUG
     LIBSQL_TRACING_LEVEL_TRACE
 
+type
   libsql_error_t* = object
+
   libsql_database_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_connection_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_statement_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_transaction_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_rows_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_row_t* = object
     err*: ptr libsql_error_t
     inner*: pointer
+
   libsql_batch_t* = object
     err*: ptr libsql_error_t
 
@@ -453,7 +461,6 @@ proc exec*(tx: Transaction, sql: string, params: varargs[Value]) =
     stmt.finalize()
 
 proc tryExec*(conn: Connection, sql: string, params: varargs[Value]): bool =
-  ## Try to execute SQL, return true on success, false on error (compatible with stdlib)
   try:
     discard conn.exec(sql, params)
     return true
@@ -471,7 +478,6 @@ proc query*(conn: Connection, sql: string, params: varargs[Value]): seq[Row] =
   stmt.finalize()
 
 proc getAllRows*(conn: Connection, sql: string, params: varargs[Value]): seq[Row] =
-  ## Alias for `query()`, compatible with stdlib db_* modules
   query(conn, sql, params)
 
 proc getRow*(conn: Connection, sql: string, params: varargs[Value]): Option[Row] =
@@ -546,5 +552,4 @@ proc `$`*(row: Row): string =
     result.add(row.columnNames[i] & ": " & $val)
   result.add(")")
 
-# Initialize libSQL on module load
 setupLibSql()
