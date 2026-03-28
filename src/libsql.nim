@@ -105,7 +105,7 @@ type
     line*: csize_t
     level*: libsql_tracing_level_t
 
-  libsql_database_desc_t* = object
+  libsql_database_desc_t* {.bycopy.} = object
     url*: cstring
     path*: cstring
     auth_token*: cstring
@@ -122,6 +122,8 @@ type
     logger*: proc (log: libsql_log_t) {.cdecl.}
     version*: cstring
 
+# Note: C returns const libsql_error_t*, but Nim doesn't distinguish const ptr
+# The const only means the pointed-to data won't be modified through this pointer
 proc libsql_setup*(config: libsql_config_t): ptr libsql_error_t {.importc.}
 proc libsql_error_message*(self: ptr libsql_error_t): cstring {.importc.}
 proc libsql_error_deinit*(self: ptr libsql_error_t) {.importc.}
