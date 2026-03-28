@@ -59,6 +59,9 @@ jobs:
       - name: Run tests
         run: LD_LIBRARY_PATH=/usr/local/lib nimble test
       
+      - name: Check test binary linking
+        run: ldd tests/test_libsql || true
+      
       - name: Build examples
         run: |
           nim c --passL:"/usr/local/lib/liblibsql.so" \
@@ -72,5 +75,5 @@ jobs:
           
       - name: Test examples run
         run: |
-          ./examples/basic_example
-          ./examples/memory_db_example
+          LD_LIBRARY_PATH=/usr/local/lib ./examples/basic_example
+          LD_LIBRARY_PATH=/usr/local/lib ./examples/memory_db_example

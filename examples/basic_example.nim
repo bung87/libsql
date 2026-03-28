@@ -14,6 +14,7 @@ proc main() =
   # Create a local database
   echo "1. Creating local database..."
   var config = defaultDbConfig("example.db")
+  echo "   Config path: ", config.path
   var db = openDatabase(config)
   echo "   Database opened successfully"
 
@@ -92,9 +93,10 @@ proc main() =
     stmt.bindParam(v("Alice"))
     discard stmt.execute()
     stmt.finalize()
+    
     tx.commit()
     echo "   Transaction committed successfully"
-  except:
+  except LibSqlError:
     tx.rollback()
     echo "   Transaction rolled back due to error: ", getCurrentExceptionMsg()
 
