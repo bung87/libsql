@@ -25,10 +25,10 @@ jobs:
           key: libsql-${{ runner.os }}-${{ hashFiles('/tmp/libsql-c/Cargo.lock') }}
       
       - name: Setup Nim
-        uses: jiro4989/setup-nim-action@v1
+        uses: alaviss/setup-nim@0.1.1
         with:
-          nim-version: ${{ matrix.nim-version }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          path: 'nim'
+          version: ${{ matrix.nim-version }}
       
       - name: Install Rust (if cache miss)
         if: steps.cache-libsql.outputs.cache-hit != 'true'
